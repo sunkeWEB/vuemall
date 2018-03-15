@@ -21,6 +21,7 @@
           <a href="/" class="navbar-link" v-show="loginstatus">{{loginname}}</a>
           <span class="navbar-link"></span>
           <a href="javascript:void(0)" class="navbar-link" @click="mdShow=true" v-show="!loginstatus">登录</a>
+          <a href="javascript:void(0)" class="navbar-link" @click="registermodal=true" v-show="!loginstatus">注册</a>
           <router-link href="javascript:;" to="/cart" v-show="loginstatus">我的购物车</router-link>
           <a href="javascript:void(0)" class="navbar-link" v-show="loginstatus" @click="logout">退出</a>
           <!--<div class="navbar-cart-container">-->
@@ -43,11 +44,13 @@
         <ul>
           <li class="regi_form_input">
             <i class="icon IconPeople"></i>
-            <input type="text" tabindex="1" name="loginname" class="regi_login_input" v-model="userName">
+            <input type="text" tabindex="1" name="loginname" placeholder="请输入用户名" class="regi_login_input"
+                   v-model="userName">
           </li>
           <li class="regi_form_input noMargin">
             <i class="icon IconPwd"></i>
-            <input type="password" tabindex="1" name="password" class="regi_login_input" v-model="userPwd">
+            <input type="password" tabindex="1" name="password" placeholder="请输入密码" class="regi_login_input"
+                   v-model="userPwd">
           </li>
         </ul>
       </div>
@@ -58,6 +61,41 @@
         </div>
       </div>
     </Modal>
+
+    <!--注册modal-->
+
+    <Modal v-bind:mdShow="registermodal" @close="closeModal">
+      <div slot="message">
+        <div class="error-wrap">
+          <div slot="mdtitle" style="font-size: 20px;font-weight: 600">注册</div>
+          <span class="error error-show">{{errmsg}}</span>
+        </div>
+        <ul>
+          <li class="regi_form_input">
+            <i class="icon IconPeople"></i>
+            <input type="text" tabindex="1" name="loginname" placeholder="请输入用户名" class="regi_login_input"
+                   v-model="registername">
+          </li>
+          <li class="regi_form_input noMargin">
+            <i class="icon IconPwd"></i>
+            <input type="password" tabindex="1" name="password" placeholder="请输入密码" class="regi_login_input"
+                   v-model="registerpwd">
+          </li>
+          <li class="regi_form_input noMargin">
+            <i class="icon IconPwd"></i>
+            <input type="password" tabindex="1" name="password" placeholder="请输入确认密码" class="regi_login_input"
+                   v-model="registerrepwd">
+          </li>
+        </ul>
+      </div>
+
+      <div slot="btngroup">
+        <div class="login-wrap">
+          <a class="btn-login" href="javascript:;" @click="register">注册</a>
+        </div>
+      </div>
+    </Modal>
+
   </header>
 </template>
 
@@ -75,7 +113,12 @@
         userPwd: '',
         loginname: '',
         loginstatus: false,
-        errmsg: ''
+        errmsg: '',
+        registermodal: false,
+        registername: '', // 注册姓名,
+        registerpwd: '',
+        registerrepwd: '', // 确认密码
+        nopublicpath: ['/cart', '/adders', '/order', '/paysuccess']
       }
     },
     mounted() {
@@ -84,11 +127,12 @@
     methods: {
       closeModal() {
         this.mdShow = false
+        this.registermodal = false;
       },
       login() {
         axios.post('/users/login', {userName: this.userName, userPwd: this.userPwd}).then(res => {
           if (res.status === 200 && res.data.code === 0) {
-            console.log("sadsadas");
+            console.log(res.data.result.userName);
             this.loginname = res.data.result.userName;
             this.loginstatus = true;
             this.$store.commit('updateinfo', res.data.result.userName);
@@ -106,6 +150,9 @@
           if (res.data.code === 0 && res.status === 200) {
             this.$store.commit('updateinfo', '');
             this.loginstatus = false;
+            if (this.nopublicpath.includes(this.$route.path)) {
+              this.$router.push('/');
+            }
           }
         })
       },
@@ -113,6 +160,7 @@
         axios.post('/users/checklogin').then(res => {
           let count = 0;  // 购物车商品总共数量
           if (res.status === 200 && res.data.code === 0) {
+            console.log(res.data.result.userName);
             this.$store.commit('updateinfo', res.data.result.userName)
             this.loginname = res.data.result.userName;
             this.loginstatus = true;
@@ -121,6 +169,13 @@
             })
           }
         })
+      },
+      register() {
+        axios.post('/users/register', {userName: this.registername, userPwd: this.registerpwd}).then(res => {
+          if (res.status === 200 && res.data.code === 0) {
+            console.log(res.data);
+          }
+        });
       }
     },
     components: {

@@ -19,6 +19,12 @@ module.exports = {
       },
       '/users/checklogin':{
         target:'http://localhost:3000'
+      },
+      '/users/register':{
+        target:'http://localhost:3000'
+      },
+      '/users/addadders':{
+        target:'http://localhost:3000'
       }
     },
 

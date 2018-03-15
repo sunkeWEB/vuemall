@@ -4,6 +4,7 @@ require('./../utils/data');
 const mongoose = require('mongoose');
 const Users = require('./../models/users');
 const Goods = require('./../models/goods');
+const utility = require('utility');
 /* GET users listing. */
 router.get('/', function (req, res, next) {
   res.send('respond with a resource');
@@ -11,7 +12,8 @@ router.get('/', function (req, res, next) {
 
 router.post('/login', (req, res) => {
   let {userName, userPwd} = {...req.body};
-  Users.findOne({userPwd, userPwd}, (err, userDoc) => {
+  userPwd = pwdmd5(userPwd);
+  Users.findOne({userName, userPwd}, (err, userDoc) => {
     if (err) {
       res.json({
         code: 1,
@@ -91,10 +93,9 @@ router.post('/payment', (req, res) => {
         result: []
       });
     } else {
-
       let adders = ''; // 存收货信息
       doc.addressList.map(v => {
-        if (v.addressId == addersId) {
+        if (v._id == addersId) {
           adders = v
         }
       });
@@ -110,7 +111,6 @@ router.post('/payment', (req, res) => {
             result: doc4
           });
         } else {
-          console.log(doc4);
           let platform = 'sk';
           let r1 = Math.floor(Math.random() * 10);
           let r2 = Math.floor(Math.random() * 10);
@@ -164,12 +164,84 @@ router.get('/getorder', (req, res) => {
         });
       } else {
         let order = [];
-        console.log(doc.orderList);
-        order = doc.orderList.filter(v => v.orderid==orderid)
+        order = doc.orderList.filter(v => v.orderid == orderid)
         res.json({
           code: 0,
           msg: '获取订单数据成功',
           result: order
+        });
+      }
+    });
+  }
+});
+
+// 注册
+router.post('/register', (req, res) => {
+  let {userName, userPwd} = {...req.body};
+  if (userName == '' || userPwd == '') {
+    res.json({
+      code: 1001,
+      msg: '参数有误',
+      result: []
+    });
+  } else {
+    userPwd = pwdmd5(userPwd);
+    Users.create({userName: userName, userPwd: userPwd}, (err, doc) => {
+      if (err) {
+        res.json({
+          code: 1,
+          msg: '系统错误',
+          result: []
+        });
+      } else {
+        res.json({
+          code: 0,
+          msg: '注册成功',
+          result: doc
+        });
+      }
+    });
+  }
+});
+
+function pwdmd5(value) {
+  let plant = "QQ397633183_.China";
+  return utility.md5(utility.md5(value + plant));
+}
+
+// 添加地址
+router.post('/addadders', (req, res) => {
+  let usersid = req.cookies.usersid;
+  let {addername, phone, adders, code} = {...req.body};
+  if (addername == '' || phone == '' || adders == '' || usersid == '') {
+    res.json({
+      code: 1001,
+      msg: '参数错误',
+      result: []
+    });
+  } else {
+    Users.update({_id: usersid}, {
+      $push: {
+        'addressList': {
+          userName: addername,
+          tel: phone,
+          isDefault: false,
+          postCode: code,
+          streetName: adders
+        }
+      }
+    }, (err, doc) => {
+      if (err) {
+        res.json({
+          code: 1,
+          msg: '系统错误',
+          result: []
+        });
+      } else {
+        res.json({
+          code: 0,
+          msg: '添加地址成功',
+          result: doc
         });
       }
     });

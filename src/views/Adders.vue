@@ -91,7 +91,7 @@
                   </div>
                   <div class="addr-opration addr-default" v-if="item.isDefault">默认地址</div>
                 </li>
-                <li class="addr-new">
+                <li class="addr-new" @click="addaddersmodal=true">
                   <div class="add-new-inner">
                     <i class="icon-add">
                       <svg class="icon icon-add">
@@ -157,6 +157,42 @@
         <a href="javascript:;" class="btn btn--m" @click="closeModal">关闭</a>
       </div>
     </Modal>
+    <!--添加收货地址-->
+    <Modal v-bind:mdShow="addaddersmodal" @close="closeModal">
+      <div slot="message">
+        <div class="error-wrap">
+          <div slot="mdtitle" style="font-size: 20px;font-weight: 600">添加收货地址</div>
+          <span class="error error-show">{{errmsg}}</span>
+        </div>
+        <ul>
+          <li class="regi_form_input">
+            <i class="iconfont icon-xingming"></i>
+            <input type="text" tabindex="1" name="loginname" placeholder="请输入收货姓名" class="regi_login_input"
+                   v-model="addername">
+          </li>
+          <li class="regi_form_input noMargin">
+            <i class="iconfont icon-phone"></i>
+            <input type="text" tabindex="1" name="password" placeholder="请输入收货电话" class="regi_login_input"
+                   v-model="phone">
+          </li>
+          <li class="regi_form_input noMargin">
+            <i class="iconfont icon-gongsiyoubian"></i>
+            <input type="text" tabindex="1" name="password" placeholder="请输入邮编编码(选填)" class="regi_login_input"
+                   v-model="code"/>
+          </li>
+          <li class="regi_form_input noMargin">
+            <i class="iconfont icon-address_icon"></i>
+            <input type="text" tabindex="1" name="password" placeholder="请输入收货地址" class="regi_login_input"
+                   v-model="adders">
+          </li>
+        </ul>
+      </div>
+      <div slot="btngroup">
+        <a href="javascript:;" class="btn btn--m" @click="closeModal">关闭</a>
+        <a href="javascript:;" class="btn btn--m" @click="addersfun">添加</a>
+      </div>
+    </Modal>
+
   </div>
 </template>
 
@@ -180,7 +216,13 @@
         deladderid: '',
         deladdername: '',
         selectedadderid: '',
-        noadderid: false
+        noadderid: false,
+        addaddersmodal: false,
+        errmsg: '',
+        addername: '',
+        phone: '',
+        adders: '',
+        code: ''
       }
     },
     mounted() {
@@ -218,6 +260,7 @@
       closeModal() {
         this.delmodal = false;
         this.noadderid = false;
+        this.addaddersmodal = false;
       },
       deladder() {
         axios.post('/goods/deladders', {addressId: this.deladderid}).then(res => {
@@ -233,7 +276,7 @@
       },
       selectid(item, index) {
         this.checkIndex = index;
-        this.selectedadderid = item.addressId;
+        this.selectedadderid = item._id;
         this.nexts = true;
       },
       next() {
@@ -242,6 +285,31 @@
           return false;
         }
         this.$router.push({path: 'order', query: {addersid: this.selectedadderid}});
+      },
+      addersfun() {
+        if (this.addername=='') {
+          this.errmsg = "收货姓名不能为空";
+          return false
+        }
+        if (this.phone=='') {
+          this.errmsg = "收货电话不能为空";
+          return false
+        }
+        if (this.adders=='') {
+          this.errmsg = "收货地址不能为空";
+          return false
+        }
+        axios.post('/users/addadders', {
+          addername: this.addername,
+          phone: this.phone,
+          adders: this.adders,
+          code: this.code
+        }).then(res => {
+          if (res.status === 200 && res.data.code === 0) {
+            this.getAdders();
+            this.closeModal();
+          }
+        });
       }
     },
     components: {
@@ -259,5 +327,18 @@
 </script>
 
 <style scoped>
+  .iconfont {
+    font-size: 24px;
+    display: inline-block;
+    float: left;
+    width: 25px;
+    height: 29px;
+    margin: 0 0 0 10px;
+  }
 
+  @media only screen and (max-width: 767px) {
+    .regi_form_input .regi_login_input {
+      top: -29px !important;
+    }
+  }
 </style>

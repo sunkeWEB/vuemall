@@ -50,9 +50,9 @@ router.get('/list', (req, res) => {
 
 // 加入到购物车
 router.post('/addcart', (req, res) => {
-  const userId = '100000077'; // 获取到用户登录的信息 id
+  const usersid = req.cookies.usersid; // 获取到用户登录的信息 id
   const productId = req.body.productId; // 商品的id
-  Users.find({userId: userId}, (err, userDoc) => {
+  Users.find({_id: usersid}, (err, userDoc) => {
     if (err) {
       res.json({
         code: 1,
@@ -307,4 +307,5 @@ router.post('/deladders', (req, res) => {
     }
   });
 });
+
 module.exports = router;
