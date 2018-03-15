@@ -128,6 +128,7 @@
       closeModal() {
         this.mdShow = false
         this.registermodal = false;
+        this.errmsg = '';
       },
       login() {
         axios.post('/users/login', {userName: this.userName, userPwd: this.userPwd}).then(res => {
