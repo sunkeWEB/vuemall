@@ -79,7 +79,7 @@
                     <dd class="address">{{item.streetName}}</dd>
                     <dd class="tel">{{item.tel}}</dd>
                   </dl>
-                  <div class="addr-opration addr-del" @click="deladderConfirm(item.streetName,item.addressId)">
+                  <div class="addr-opration addr-del" @click="deladderConfirm(item.streetName,item._id)">
                     <a href="javascript:;" class="addr-del-btn">
                       <svg class="icon icon-del">
                         <use xlink:href="#icon-del"></use>
@@ -87,7 +87,7 @@
                     </a>
                   </div>
                   <div class="addr-opration addr-set-default" v-if="!item.isDefault">
-                    <a href="javascript:;" class="addr-set-default-btn" @click="setDefaultadder(item.addressId)"><i>设置为默认</i></a>
+                    <a href="javascript:;" class="addr-set-default-btn" @click="setDefaultadder(item._id)"><i>设置为默认</i></a>
                   </div>
                   <div class="addr-opration addr-default" v-if="item.isDefault">默认地址</div>
                 </li>
@@ -246,7 +246,7 @@
       setDefaultadder(addersid) {
         axios.post('/goods/setdefaultadder', {addersid}).then(res => {
           if (res.status === 200 && res.data.code === 0) {
-
+            this.getAdders();
           } else {
             alert("设置失败");
           }
@@ -287,15 +287,15 @@
         this.$router.push({path: 'order', query: {addersid: this.selectedadderid}});
       },
       addersfun() {
-        if (this.addername=='') {
+        if (this.addername == '') {
           this.errmsg = "收货姓名不能为空";
           return false
         }
-        if (this.phone=='') {
+        if (this.phone == '') {
           this.errmsg = "收货电话不能为空";
           return false
         }
-        if (this.adders=='') {
+        if (this.adders == '') {
           this.errmsg = "收货地址不能为空";
           return false
         }
@@ -306,6 +306,10 @@
           code: this.code
         }).then(res => {
           if (res.status === 200 && res.data.code === 0) {
+            this.addername = '';
+            this.phone = '';
+            this.adders = '';
+            this.code = '';
             this.getAdders();
             this.closeModal();
           }

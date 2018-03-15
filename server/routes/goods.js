@@ -262,7 +262,7 @@ router.post('/setdefaultadder', (req, res) => {
     } else {
       let adderssList = doc.addressList;
       adderssList.map(v => {
-        if (addersid == v.addressId) {
+        if (addersid == v._id) {
           v.isDefault = true;
         } else {
           v.isDefault = false;
@@ -291,7 +291,7 @@ router.post('/setdefaultadder', (req, res) => {
 router.post('/deladders', (req, res) => {
   let usersid = req.cookies.usersid;
   let {addressId} = {...req.body};
-  Users.update({_id: usersid}, {$pull: {addressList: {addressId}}}, (err, doc) => {
+  Users.update({_id: usersid}, {$pull: {addressList: {_id:addressId}}}, (err, doc) => {
     if (err) {
       res.json({
         code:1,
