@@ -100,7 +100,7 @@
             <ul>
               <li class="order-total-price">
                 <span>总计:</span>
-                <span>{{totalPrice | currency('$')}}</span>
+                <span>{{totalPrice | currency('￥')}}</span>
               </li>
             </ul>
           </div>

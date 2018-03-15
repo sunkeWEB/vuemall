@@ -126,7 +126,7 @@
             </div>
             <div class="cart-foot-r">
               <div class="item-total">
-                <span>总计: </span><span class="total-price">{{totalPrice | currency('$')}}</span>
+                <span>总计: </span><span class="total-price">{{totalPrice | currency('￥')}}</span>
               </div>
               <div class="btn-wrap">
                 <a class="btn btn--red" :class="{'btn--dis':checkCount===0}" @click="checkOut">立即支付</a>

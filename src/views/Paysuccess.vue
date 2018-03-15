@@ -26,7 +26,7 @@
           <h3>恭喜!<br>您的订单正在处理中!</h3>
           <p>
             <span>订单号: {{orderid}}</span>
-            <span>交易金额: {{totalprice | currency('$')}}</span>
+            <span>交易金额: {{totalprice | currency('￥')}}</span>
           </p>
           <div class="order-create-btn-wrap">
             <div class="btn-l-wrap">
