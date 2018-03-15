@@ -185,20 +185,39 @@ router.post('/register', (req, res) => {
       result: []
     });
   } else {
-    userPwd = pwdmd5(userPwd);
-    Users.create({userName: userName, userPwd: userPwd}, (err, doc) => {
-      if (err) {
+    Users.count({userName: userName}, (err2, count) => {
+      if (err2) {
         res.json({
-          code: 1,
-          msg: '系统错误',
-          result: []
+          code:1,
+          msg:"系统错误",
+          result:[]
         });
-      } else {
-        res.json({
-          code: 0,
-          msg: '注册成功',
-          result: doc
-        });
+      }else{
+        console.log("count=" + count);
+        if (count>0) {
+          res.json({
+            code:11,
+            msg:'用户名已经被注册',
+            result:[]
+          });
+        }else {
+          userPwd = pwdmd5(userPwd);
+          Users.create({userName: userName, userPwd: userPwd}, (err, doc) => {
+            if (err) {
+              res.json({
+                code: 1,
+                msg: '系统错误',
+                result: []
+              });
+            } else {
+              res.json({
+                code: 0,
+                msg: '注册成功',
+                result: doc
+              });
+            }
+          });
+        }
       }
     });
   }

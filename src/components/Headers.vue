@@ -171,9 +171,23 @@
         })
       },
       register() {
+        if (this.registername == '') {
+          this.errmsg = "用户名必须填写";
+          return false
+        }
+        if (this.registerpwd == '') {
+          this.errmsg = "密码必须填写";
+          return false;
+        }
+        if (this.registerpwd != this.registerrepwd) {
+          this.errmsg = "密码和确认密码不相等";
+          return false;
+        }
         axios.post('/users/register', {userName: this.registername, userPwd: this.registerpwd}).then(res => {
           if (res.status === 200 && res.data.code === 0) {
-            console.log(res.data);
+            this.registermodal = false;
+          } else {
+            this.errmsg = res.data.msg
           }
         });
       }
